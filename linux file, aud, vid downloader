@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Prompt the user to enter the URL link
+read -p "Enter the URL link: " url
+
+# Define the directory to store downloaded files
+download_dir="downloaded_files"
+
+# Create the download directory or exit if unsuccessful
+mkdir -p "$download_dir" || exit 1
+
+# Check if wget is installed
+if ! command -v wget &> /dev/null; then
+    echo "Error: wget is not installed. Please install wget and try again."
+    exit 1
+fi
+
+# Use wget to download files (jpeg, jpg, png, mp4, mp3) recursively to the specified directory
+if wget -r -P "$download_dir" -A jpeg,jpg,png,mp4,mkv,mp3 "$url"; then
+    echo "Files downloaded successfully."
+
+    # Count individual files
+    audio_count=$(find "$download_dir" -type f -name '*.mp3' | wc -l)
+    image_count=$(find "$download_dir" -type f \( -name '.jpeg' -o -name '.jpg' -o -name '*.png' \) | wc -l)
+    video_count=$(find "$download_dir" -type f \( -name '.mp4' -o -name '.mkv' \) | wc -l)
+
+    echo "Number of audio files (MP3): $audio_count"
+    echo "Number of image files (JPEG, JPG, PNG): $image_count"
+    echo "Number of video files (MP4, MKV): $video_count"
+
+else
+    echo "Download failed or no files downloaded."
+fi
+
